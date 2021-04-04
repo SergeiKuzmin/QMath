@@ -30,12 +30,14 @@ class Pulse(object):
         controls = []
         for pulse in self.pulses:
             controls.append(pulse.pulse_time(timespan))
+        print('pulse_time = ', np.array(controls))
         return np.array(controls)
 
     def der_pulse_time(self, timespan):
         der_controls = []
         for pulse in self.pulses:
             der_controls += pulse.der_pulse_time(timespan)
+        print('der_pulse_time = ', np.array(der_controls))
         return np.array(der_controls)
 
 
@@ -58,8 +60,8 @@ class Sine(object):
         return self.a * np.cos(self.omega * timespan) + self.b * np.sin(self.omega * timespan)
 
     def der_pulse_time(self, timespan):
-        der_a = np.cos(self.omega)
-        der_b = np.sin(self.omega)
+        der_a = np.cos(self.omega * timespan)
+        der_b = np.sin(self.omega * timespan)
         der_omega = timespan * (-self.a * np.sin(self.omega * timespan) +
                                 self.b * np.cos(self.omega * timespan))
         return [der_a, der_b, der_omega]

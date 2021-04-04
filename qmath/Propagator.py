@@ -1,5 +1,6 @@
 import numpy as np
 from qmath.Stepper import Stepper
+import copy
 
 
 class Propagator(object):
@@ -18,7 +19,8 @@ class Propagator(object):
             der_u.append(np.zeros_like(self.hd, dtype=complex))
         for t in range(len(timespan[:-1])):
             dt = timespan[t + 1] - timespan[t]
-            u, der_u = self.stepper.do_step(u, der_u, pulse, t, dt)
+            u, der_u = self.stepper.do_step(copy.deepcopy(u), copy.deepcopy(der_u), pulse,
+                                            timespan[t], dt)
             list_u.append(u)
         self.u = u
         self.der_u = der_u

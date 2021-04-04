@@ -6,9 +6,7 @@ class Fidelity(object):
         self.u_target = u_target
 
     def fidelity(self, u):
-        return np.trace(np.abs(np.dot(self.u_target.T.conj(), u)) ** 2 /
-                        np.trace(np.dot(self.u_target.T.conj(), self.u_target)) *
-                        np.trace(np.dot(u.T.conj(), u)))
+        return np.abs(np.trace(np.dot(self.u_target.T.conj(), u))) ** 2 / u.shape[0] ** 2
 
     def infidelity(self, u):
         return 1 - self.fidelity(u)

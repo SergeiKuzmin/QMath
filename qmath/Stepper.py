@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 
 class Stepper(object):
@@ -12,14 +13,14 @@ class Stepper(object):
 
     def set_system_cur(self, controls, pulse, t):
         self.c = len(pulse.der_pulse_time(t))
-        ham = self.hd
+        ham = copy.copy(self.hd)
         for k, control in enumerate(controls):
             ham += control * self.hc[k]
         der_ham = []
         index = 0
-        for k, pulse in enumerate(pulse.pulses):
-            for param in range(pulse.number_of_params):
-                der_ham.append(pulse.der_pulse_time(t)[index] * self.hc[k])
+        for k, loc_pulse in enumerate(pulse.pulses):
+            for param in range(loc_pulse.number_of_params):
+                der_ham.append(pulse.der_pulse_time(t)[index] * copy.copy(self.hc[k]))
                 index += 1
         self.sys_cur = np.kron(np.eye(self.c + 1, dtype=complex), ham)
         for k in range(self.c):
@@ -30,14 +31,14 @@ class Stepper(object):
 
     def set_system_prev(self, controls, pulse, t):
         self.c = len(pulse.der_pulse_time(t))
-        ham = self.hd
+        ham = copy.copy(self.hd)
         for k, control in enumerate(controls):
             ham += control * self.hc[k]
         der_ham = []
         index = 0
-        for k, pulse in enumerate(pulse.pulses):
-            for param in range(pulse.number_of_params):
-                der_ham.append(pulse.der_pulse_time(t)[index] * self.hc[k])
+        for k, loc_pulse in enumerate(pulse.pulses):
+            for param in range(loc_pulse.number_of_params):
+                der_ham.append(pulse.der_pulse_time(t)[index] * copy.copy(self.hc[k]))
                 index += 1
         self.sys_prev = np.kron(np.eye(self.c + 1, dtype=complex), ham)
         for k in range(self.c):
@@ -54,18 +55,17 @@ class Stepper(object):
             vector = np.zeros(self.c + 1, dtype=complex)
             vector[k + 1] = 1.0
             self.x += np.kron(vector, der_u[k])
+        self.x = self.x.T
 
     def do_step(self, u, der_u, pulse, t, dt):
         print('do_step')
         self.set_system_prev(pulse.pulse_time(t), pulse, t)
         self.set_system_cur(pulse.pulse_time(t + dt), pulse, t + dt)
         self.set_x(u, der_u)
-        print(self.sys_cur.shape)
-        print(self.x.shape)
         x = np.dot(np.linalg.inv(np.eye(self.sys_cur.shape[0]) - 0.5 * dt * self.sys_cur),
-                   np.dot(np.eye(self.sys_prev.shape[0]) + 0.5 * dt * self.sys_prev, self.x.T))
+                   np.dot(np.eye(self.sys_prev.shape[0]) + 0.5 * dt * self.sys_prev, self.x))
         u_new = x[0:u.shape[0]]
         der_u_new = []
-        for k, der in enumerate(der_u):
+        for k in range(len(der_u)):
             der_u_new.append(x[u.shape[0] * (k + 1):u.shape[0] * (k + 1) + u.shape[0]])
         return u_new, der_u_new
