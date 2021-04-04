@@ -23,21 +23,21 @@ class Pulse(object):
     def set_params(self, list_of_params):
         index = 0
         for pulse in self.pulses:
-            pulse.set_params(list_of_params[index:index + pulse.number_of_params])
+            pulse.set_params(*list_of_params[index:index + pulse.number_of_params])
             index += pulse.number_of_params
 
     def pulse_time(self, timespan):
         controls = []
         for pulse in self.pulses:
             controls.append(pulse.pulse_time(timespan))
-        print('pulse_time = ', np.array(controls))
+        # print('pulse_time = ', np.array(controls))
         return np.array(controls)
 
     def der_pulse_time(self, timespan):
         der_controls = []
         for pulse in self.pulses:
             der_controls += pulse.der_pulse_time(timespan)
-        print('der_pulse_time = ', np.array(der_controls))
+        # print('der_pulse_time = ', np.array(der_controls))
         return np.array(der_controls)
 
 

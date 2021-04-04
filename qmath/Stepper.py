@@ -25,9 +25,10 @@ class Stepper(object):
         self.sys_cur = np.kron(np.eye(self.c + 1, dtype=complex), ham)
         for k in range(self.c):
             matrix = np.zeros_like(np.eye(self.c + 1, dtype=complex), dtype=complex)
-            matrix[0][k + 1] = 1.0
+            matrix[k + 1][0] = 1.0
             self.sys_cur += np.kron(matrix, der_ham[k])
         self.sys_cur = -1j * self.sys_cur
+        # print(self.sys_cur)
 
     def set_system_prev(self, controls, pulse, t):
         self.c = len(pulse.der_pulse_time(t))
@@ -43,7 +44,7 @@ class Stepper(object):
         self.sys_prev = np.kron(np.eye(self.c + 1, dtype=complex), ham)
         for k in range(self.c):
             matrix = np.zeros_like(np.eye(self.c + 1, dtype=complex), dtype=complex)
-            matrix[0][k + 1] = 1.0
+            matrix[k + 1][0] = 1.0
             self.sys_prev += np.kron(matrix, der_ham[k])
         self.sys_prev = -1j * self.sys_prev
 
@@ -58,7 +59,7 @@ class Stepper(object):
         self.x = self.x.T
 
     def do_step(self, u, der_u, pulse, t, dt):
-        print('do_step')
+        # print('do_step')
         self.set_system_prev(pulse.pulse_time(t), pulse, t)
         self.set_system_cur(pulse.pulse_time(t + dt), pulse, t + dt)
         self.set_x(u, der_u)
