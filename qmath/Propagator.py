@@ -8,8 +8,9 @@ class Propagator(object):
         self.hd = hd
         self.hc = hc
         self.stepper = Stepper(self.hd, self.hc)
-        self.u = None
+        self.u = np.eye(hd.shape[0], dtype=complex)
         self.der_u = None
+        self.list_u = None
 
     def evolution(self, pulse, timespan):
         list_u = []
@@ -23,5 +24,6 @@ class Propagator(object):
             list_u.append(u)
         self.u = u
         self.der_u = der_u
+        self.list_u = list_u
         print('INFO: full_evolution')
         return list_u, der_u
